@@ -43,8 +43,6 @@ pub(crate) use socket::Socket;
 
 mod statx;
 
-mod symlink;
-
 mod unlink_at;
 
 mod util;

@@ -20,6 +20,3 @@ mod statx;
 pub use statx::is_dir_regfile;
 pub use statx::statx;
 pub use statx::StatxBuilder;
-
-mod symlink;
-pub use symlink::symlink;

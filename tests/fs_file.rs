@@ -130,7 +130,6 @@ fn cancel_read() {
 }
 
 #[test]
-#[ignore]
 fn explicit_close() {
     let mut tempfile = tempfile();
     tempfile.write_all(HELLO).unwrap();
@@ -162,7 +161,6 @@ fn drop_open() {
 }
 
 #[test]
-#[ignore]
 fn drop_off_runtime() {
     let file = tokio_uring::start(async {
         let tempfile = tempfile();

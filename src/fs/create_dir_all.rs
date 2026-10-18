@@ -124,7 +124,7 @@ impl DirBuilder {
     // recursion when only the first level of the directory needs to be built. For now, this serves
     // its purpose.
 
-    fn recurse_create_dir_all<'a>(&'a self, path: &'a Path) -> LocalBoxFuture<'a, io::Result<()>> {
+    fn recurse_create_dir_all<'a>(&'a self, path: &'a Path) -> LocalBoxFuture<io::Result<()>> {
         Box::pin(async move {
             if path == Path::new("") {
                 return Ok(());
@@ -139,7 +139,10 @@ impl DirBuilder {
             match path.parent() {
                 Some(p) => self.recurse_create_dir_all(p).await?,
                 None => {
-                    return Err(std::io::Error::other("failed to create whole tree"));
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "failed to create whole tree",
+                    ));
                     /* TODO build own allocation free error some day like the std library does.
                     return Err(io::const_io_error!(
                         io::ErrorKind::Uncategorized,

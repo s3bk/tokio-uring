@@ -118,7 +118,8 @@ impl Driver {
                 return Ok(());
             }
         }
-        Err(io::Error::other(
+        Err(io::Error::new(
+            io::ErrorKind::Other,
             "fixed buffers are not currently registered",
         ))
     }
@@ -387,6 +388,13 @@ impl Drop for Driver {
             match std::mem::replace(cycle, Lifecycle::Ignored(Box::new(()))) {
                 lc @ Lifecycle::Completed(_) => {
                     // don't cancel completed items
+                    *cycle = lc;
+                }
+
+                // bitmule: the dropped op's data (buffer, msghdr, address) is still
+                // owned by the kernel until the cancel completes. Replacing it
+                // freed it too early (a use-after-free the kernel wrote into).
+                lc @ Lifecycle::Ignored(_) => {
                     *cycle = lc;
                 }
 
