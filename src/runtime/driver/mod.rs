@@ -391,6 +391,13 @@ impl Drop for Driver {
                     *cycle = lc;
                 }
 
+                // bitmule: the dropped op's data (buffer, msghdr, address) is still
+                // owned by the kernel until the cancel completes. Replacing it
+                // freed it too early (a use-after-free the kernel wrote into).
+                lc @ Lifecycle::Ignored(_) => {
+                    *cycle = lc;
+                }
+
                 Lifecycle::CompletionList(indices) => {
                     let mut list = indices.clone().into_list(&mut self.ops.completions);
                     if !io_uring::cqueue::more(list.peek_end().unwrap().flags) {
